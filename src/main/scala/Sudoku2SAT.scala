@@ -29,10 +29,17 @@ object Sudoku2SAT {
     // Add rules for other things
     buffer.appendAll(product(0 to 8).flatMap(Function.tupled(oneLabel _)(_)))
 
-    val lines = buffer.toList
+    printCNF(buffer.toList)
+  }
 
+  /**
+   * CNF output
+   */
+  def printCNF(lines: Seq[Seq[Int]]) {
+    // print header
     println("p cnf " + lines.map(_.max).max + " " + lines.length)
-    lines.foreach(line => println(line.mkString(" ") + " 0"))
+    // print lines sorted by sub-list length
+    lines.sortBy(-_.length).foreach(line => println(line.mkString(" ") + " 0"))
   }
 
   def readFile(name: String) = Source
