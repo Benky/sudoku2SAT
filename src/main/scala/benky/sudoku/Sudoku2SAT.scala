@@ -1,6 +1,12 @@
+package benky.sudoku
+
 import collection.mutable.ListBuffer
+import format.{BoolExpressionFormat, CNFFormat}
 import io.Source
 
+/**
+ * Simple application which converts given Sudoku puzzle to SAT
+ */
 object Sudoku2SAT {
 
   val ValueList = 1 to 9
@@ -29,20 +35,8 @@ object Sudoku2SAT {
     // Add rules for other things
     buffer.appendAll(product(0 to 8).flatMap((oneLabel _).tupled(_)))
 
-    printCNF(buffer.toList)
-  }
-
-  /**
-   * CNF output
-   */
-  def printCNF(lines: Seq[Seq[Predicate]]) {
-    val convertedLines = lines.map(line => line.map(coordinatesToVar(_)))
-
-    // print header
-    println("p cnf " + convertedLines.map(_.max).max + " " + lines.length)
-
-    // print lines sorted by sub-list length
-    convertedLines.sortBy(-_.length).foreach(line => println(line.mkString(" ") + " 0"))
+    val format = new BoolExpressionFormat()
+    format.format(buffer.toList)
   }
 
   def readFile(name: String) = Source
@@ -60,14 +54,6 @@ object Sudoku2SAT {
     i => group.map {
       case (a, b) => VAR(a, b, i)
     }
-  }
-
-  /**
-   * Converts given coordinates to variable accepted by SAT solvers
-   */
-  def coordinatesToVar(p: Predicate): Int = p match {
-    case VAR(x, y, v) => ((v - 1) * 81 + x * 9 + y + 1)
-    case NOT(pp) => (-1) * coordinatesToVar(pp)
   }
 
   /**
