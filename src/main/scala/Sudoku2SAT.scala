@@ -12,10 +12,10 @@ object Sudoku2SAT {
       sys.exit(1)
     }
 
-    val buffer = ListBuffer.empty[List[Int]]
+    val buffer = ListBuffer.empty[List[Predicate]]
 
     // Add preset values
-    buffer.appendAll(readFile(args(0)).map(i => List(Function.tupled(coordinatesToVar _)(i))))
+    buffer.appendAll(readFile(args(0)).map(i => List(VAR(i._1, i._2, i._3))))
 
     // Add rules for rows
     buffer.appendAll(rows.flatMap(addValuesToGroups(_)))
@@ -27,7 +27,7 @@ object Sudoku2SAT {
     buffer.appendAll(squares.flatMap(addValuesToGroups(_)))
 
     // Add rules for other things
-    buffer.appendAll(product(0 to 8).flatMap(Function.tupled(oneLabel _)(_)))
+    buffer.appendAll(product(0 to 8).flatMap((oneLabel _).tupled(_)))
 
     printCNF(buffer.toList)
   }
@@ -35,11 +35,14 @@ object Sudoku2SAT {
   /**
    * CNF output
    */
-  def printCNF(lines: Seq[Seq[Int]]) {
+  def printCNF(lines: Seq[Seq[Predicate]]) {
+    val convertedLines = lines.map(line => line.map(coordinatesToVar(_)))
+
     // print header
-    println("p cnf " + lines.map(_.max).max + " " + lines.length)
+    println("p cnf " + convertedLines.map(_.max).max + " " + lines.length)
+
     // print lines sorted by sub-list length
-    lines.sortBy(-_.length).foreach(line => println(line.mkString(" ") + " 0"))
+    convertedLines.sortBy(-_.length).foreach(line => println(line.mkString(" ") + " 0"))
   }
 
   def readFile(name: String) = Source
@@ -55,14 +58,17 @@ object Sudoku2SAT {
 
   def addValuesToGroups(group: List[(Int, Int)]) = ValueList.map {
     i => group.map {
-      case (a, b) => coordinatesToVar(a, b, i)
+      case (a, b) => VAR(a, b, i)
     }
   }
 
   /**
    * Converts given coordinates to variable accepted by SAT solvers
    */
-  def coordinatesToVar(x: Int, y: Int, z: Int) = ((z - 1) * 81 + x * 9 + y + 1)
+  def coordinatesToVar(p: Predicate): Int = p match {
+    case VAR(x, y, v) => ((v - 1) * 81 + x * 9 + y + 1)
+    case NOT(pp) => (-1) * coordinatesToVar(pp)
+  }
 
   /**
    * Creates rules for each row
@@ -77,7 +83,7 @@ object Sudoku2SAT {
   /**
    * Creates rules for each square
    */
-  def squares = product(0 to 2).map(Function.tupled(quadrant _)(_))
+  def squares = product(0 to 2).map((quadrant _).tupled(_))
 
   /**
    * Helper method which generates coordinates for each square
@@ -90,10 +96,10 @@ object Sudoku2SAT {
    * Ensures that every cell is label with exactly one value
    */
   def oneLabel(x: Int, y: Int) = {
-    def notBoth(i: Int, j: Int) = List(-coordinatesToVar(x, y, i), -coordinatesToVar(x, y, j))
-    val atLeastOne = ValueList.map(i => coordinatesToVar(x, y, i))
+    def notBoth(i: Int, j: Int) = List(NOT(VAR(x, y, i)), NOT(VAR(x, y, j)))
+    val atLeastOne = ValueList.map(i => VAR(x, y, i))
     val pairs = product(ValueList).filter(i => i._1 != i._2)
-    atLeastOne.toList :: pairs.map(Function.tupled(notBoth _)(_)).toList
+    atLeastOne.toList :: pairs.map((notBoth _).tupled(_)).toList
   }
 
   /**
