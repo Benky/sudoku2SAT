@@ -1,8 +1,7 @@
 package benky.sudoku
 
 import collection.mutable.ListBuffer
-import format.{BoolExpressionFormat, CNFFormat}
-import io.Source
+import format.{CNFOutputFormat, SimpleInputFormat}
 
 /**
  * Simple application which converts given Sudoku puzzle to SAT
@@ -21,7 +20,7 @@ object Sudoku2SAT {
     val buffer = ListBuffer.empty[List[Predicate]]
 
     // Add preset values
-    buffer.appendAll(readFile(args(0)).map(i => List(VAR(i._1, i._2, i._3))))
+    buffer.appendAll(new SimpleInputFormat().readFile(args(0)).map(i => List(VAR(i._1, i._2, i._3))))
 
     // Add rules for rows
     buffer.appendAll(rows.flatMap(addValuesToGroups(_)))
@@ -35,19 +34,7 @@ object Sudoku2SAT {
     // Add rules for other things
     buffer.appendAll(product(0 to 8).flatMap((oneLabel _).tupled(_)))
 
-    val format = new BoolExpressionFormat()
-    format.format(buffer.toList)
-  }
-
-  def readFile(name: String) = Source
-    .fromFile(name)
-    .getLines()
-    .map(_.zipWithIndex)
-    .zipWithIndex
-    .flatMap {
-    case (line, row) => line.toList.filter(_._1 != '0').map {
-      case (c, column) => (row, column, c.toInt - 48)
-    }
+    new CNFOutputFormat().format(buffer.toList)
   }
 
   def addValuesToGroups(group: List[(Int, Int)]) = ValueList.map {

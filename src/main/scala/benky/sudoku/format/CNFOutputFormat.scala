@@ -5,7 +5,7 @@ import benky.sudoku.{NOT, VAR, Predicate}
 /**
  * Prints given of predicates in CNF format so it can be passed to any SAT solver
  */
-class CNFFormat extends OutputFormat {
+class CNFOutputFormat extends OutputFormat {
   def format(lines: Seq[Seq[Predicate]]) {
     val convertedLines = lines.map(line => line.map(coordinatesToVar(_)))
 

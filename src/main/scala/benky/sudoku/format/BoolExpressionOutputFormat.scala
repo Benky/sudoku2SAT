@@ -5,7 +5,7 @@ import benky.sudoku.{NOT, VAR, Predicate}
 /**
  * Prints given collection of predicates as a human readable bool expression
  */
-class BoolExpressionFormat extends OutputFormat {
+class BoolExpressionOutputFormat extends OutputFormat {
   def format(lines: Seq[Seq[Predicate]]) {
     val convertedLines = lines.map(line => "( " + line.map(printableVar(_)).mkString(" OR ") + " )")
     println(convertedLines.sortBy(-_.length).mkString(" AND \n"))
