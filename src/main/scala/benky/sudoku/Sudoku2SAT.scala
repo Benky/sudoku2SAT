@@ -6,7 +6,7 @@ import format.{CNFOutputFormat, SimpleInputFormat}
 /**
  * Simple application which converts given Sudoku puzzle to SAT
  */
-object Sudoku2SAT {
+23object Sudoku2SAT {
 
   val ValueList = 1 to 9
 
