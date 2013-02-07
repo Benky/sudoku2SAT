@@ -25,3 +25,4 @@ Where ``0`` means unknown value, and non-zero value means known value.
 
 Program prints output on standard output, so if you want it in file ... use imagination :-)
 1
+1
