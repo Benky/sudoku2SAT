@@ -27,3 +27,4 @@ Program prints output on standard output, so if you want it in file ... use imag
 1
 1
 1
+1
