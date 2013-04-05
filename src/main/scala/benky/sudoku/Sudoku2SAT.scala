@@ -8,6 +8,7 @@ import format.{CNFOutputFormat, SimpleInputFormat}
  */
 object Sudoku2SAT {
 
+"a"
   val ValueList = 1 to 9
 
   def main(args: Array[String]) {
