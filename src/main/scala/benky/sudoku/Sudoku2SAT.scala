@@ -6,8 +6,9 @@ import format.{CNFOutputFormat, SimpleInputFormat}
 /**
  * Simple application which converts given Sudoku puzzle to SAT
  */
-23object Sudoku2SAT {
+object Sudoku2SAT {
 
+"a"
   val ValueList = 1 to 9
 
   def main(args: Array[String]) {
