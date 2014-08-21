@@ -22,4 +22,4 @@ Sudoku should be entered in following format:
 
 Where ``0`` means unknown value, and non-zero value means known value.
 
-Program prints output on standard output, so if you want it in file ... use imagination :-)
+Program prints output to standard output, so if you want it in file ... use imagination :-)
